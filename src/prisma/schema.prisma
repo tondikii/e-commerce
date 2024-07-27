@@ -1,0 +1,82 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  name            String   @db.VarChar(50)
+  email           String   @db.VarChar(50) @unique
+  password        String   @db.VarChar(60) // Store hashed passwords
+  phoneNumber     String   @db.VarChar(15)
+  role            String   @db.VarChar(10)
+  address         String?  @db.VarChar(255)
+  city            String?  @db.VarChar(50)
+  postalCode      String?  @db.VarChar(5)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  carts           Cart[]
+  productRatings  ProductRating[]
+}
+
+model Size {
+  id        Int     @id @default(autoincrement())
+  name      String  @db.VarChar(10)
+  code      String  @db.VarChar(5)
+  products  Product[]
+}
+
+model Color {
+  id        Int     @id @default(autoincrement())
+  name      String  @db.VarChar(15)
+  hexCode   String  @db.VarChar(7)
+  products  Product[]
+}
+
+model Product {
+  id              Int     @id @default(autoincrement())
+  name            String  @db.VarChar(50)
+  description     String  @db.VarChar(255)
+  images          String[]
+  price           Int
+  discount        Int?
+  quantity        Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  size            Size    @relation(fields: [sizeId], references: [id])
+  sizeId          Int
+  color           Color   @relation(fields: [colorId], references: [id])
+  colorId         Int
+  carts           Cart[]
+  productRatings  ProductRating[]
+}
+
+model Cart {
+  id          Int     @id @default(autoincrement())
+  quantity    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User @relation(fields: [userId], references: [id])
+  userId      Int
+  product     Product @relation(fields: [productId], references: [id])
+  productId   Int
+}
+
+model ProductRating {
+  id          Int      @id @default(autoincrement())
+  rate        Int
+  comment     String?  @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User @relation(fields: [userId], references: [id])
+  userId      Int
+  product     Product @relation(fields: [productId], references: [id])
+  productId   Int
+}

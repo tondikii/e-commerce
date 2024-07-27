@@ -1,5 +1,6 @@
 # e-commerce
-E-commerce website named Trevo using next.js typescript with backend and frontend in the same repository.
+
+E-commerce website named Belanja.co using next.js typescript with backend and frontend in the same repository.
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
