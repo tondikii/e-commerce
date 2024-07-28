@@ -6,8 +6,15 @@ import Swal from "sweetalert2";
 import {Key, Mail} from "@mui/icons-material";
 import {StyledInput, Select, StyledTextarea, StyledButton} from "@/components";
 import Link from "next/link";
-import {CITY_OPTIONS, MAX_VARCHAR_LENGTH} from "@/constants";
+import {
+  CITY_OPTIONS,
+  MAX_VARCHAR_LENGTH,
+  RESPONSE_MESSAGE_INVALID_EMAIL_FORMAT,
+  RESPONSE_MESSAGE_INVALID_PHONE_NUMBER,
+} from "@/constants";
 import {CustomTargetType} from "@/types";
+import {validateEmailFormat, validatePhoneNumber} from "@/utils";
+import {useRouter} from "next/navigation";
 
 interface Props {
   type: "sign-up" | "sign-in";
@@ -38,10 +45,14 @@ const initialFormSignUp: FormAuthType = {
 };
 
 const FormAuthComponent: FC<Props> = ({type}) => {
+  const router = useRouter();
+
   const isSignUp: boolean = type === "sign-up";
   const usedInitialForm = isSignUp ? initialFormSignUp : initialFormSignIn;
   const [formData, setFormData] = useState<FormAuthType>(usedInitialForm);
   const [submitted, setSubmitted] = useState<boolean>(false);
+
+  const phonNumberWithCode: string = `+62${formData?.phoneNumber}`;
 
   const onChange = (
     e:
@@ -70,8 +81,21 @@ const FormAuthComponent: FC<Props> = ({type}) => {
         if (submitted) {
           errorsForm[key as keyof FormAuthType] = "Data ini perlu diisi";
         }
+      } else if (key === "email") {
+        const isValidEmailFormat = validateEmailFormat(formData.email);
+        if (!isValidEmailFormat) {
+          errorsForm.email = RESPONSE_MESSAGE_INVALID_EMAIL_FORMAT;
+          isValidForm = false;
+        }
+      } else if (key === "phoneNumber") {
+        const isValidPhoneNumber = validatePhoneNumber(phonNumberWithCode);
+        if (!isValidPhoneNumber) {
+          errorsForm.phoneNumber = RESPONSE_MESSAGE_INVALID_PHONE_NUMBER;
+          isValidForm = false;
+        }
       }
     });
+
     return {errorsForm, isValidForm};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData, submitted]);
@@ -83,21 +107,23 @@ const FormAuthComponent: FC<Props> = ({type}) => {
     }
     try {
       if (isSignUp) {
-        await api.post("/user", formData);
+        await api.post("/user", {...formData, phoneNumber: phonNumberWithCode});
+        router.push("/sign-in");
         Swal.fire({
           title: "Berhasil Membuat Akun",
-          text: "Akun anda berhasil dibuat, selamat bergabung dengan Belanja.co",
+          text: "Akun anda berhasil dibuat, selamat bergabung dengan TokoTrend. Silahkan login untuk berbelanja.",
           icon: "success",
         });
       } else {
         await api.post("/login", formData);
         Swal.fire({
           title: "Berhasil Masuk",
-          text: "Selamat datang kembali di Belanja.co",
+          text: "Selamat datang kembali di TokoTrend",
           icon: "success",
         });
       }
     } catch (err: any) {
+      console.log(err);
       Swal.fire({
         title: "Gagal",
         text: isSignUp ? "Gagal membuat akun" : "Gagal masuk",

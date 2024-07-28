@@ -10,6 +10,8 @@ export const RESPONSE_MESSAGE_INVALID_EMAIL = "Email tidak ditemukan";
 export const RESPONSE_MESSAGE_INVALID_EMAIL_FORMAT =
   "Format email tidak sesuai";
 export const RESPONSE_MESSAGE_DUPLICATED_EMAIL = "Email telah digunakan";
+export const RESPONSE_MESSAGE_INVALID_PHONE_NUMBER =
+  "Format nomor telepon tidak sesuai";
 export const RESPONSE_MESSAGE_PRISMA_VALIDATION =
   "Tipe data yang dikirimkan tidak sesuai";
 
