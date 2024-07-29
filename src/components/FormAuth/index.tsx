@@ -15,6 +15,7 @@ import {
 import {CustomTargetType} from "@/types";
 import {validateEmailFormat, validatePhoneNumber} from "@/utils";
 import {useRouter} from "next/navigation";
+import {signIn} from "next-auth/react";
 
 interface Props {
   type: "sign-up" | "sign-in";
@@ -60,8 +61,14 @@ const FormAuthComponent: FC<Props> = ({type}) => {
       | React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     const {name, value} = e.target;
-    if (value?.length <= MAX_VARCHAR_LENGTH) {
+    let maxLength: number = MAX_VARCHAR_LENGTH;
+    if (name === "postalCode") {
+      maxLength = 5;
+    }
+    if (value?.length <= maxLength) {
       setFormData({...formData, [name]: value});
+    } else {
+      setFormData({...formData, [name]: value.slice(0, maxLength)});
     }
   };
 
@@ -111,11 +118,18 @@ const FormAuthComponent: FC<Props> = ({type}) => {
         router.push("/sign-in");
         Swal.fire({
           title: "Berhasil Membuat Akun",
-          text: "Akun anda berhasil dibuat, selamat bergabung dengan TokoTrend. Silahkan login untuk berbelanja.",
+          text: "Selamat bergabung dengan TokoTrend! Anda sekarang bisa masuk untuk berbelanja.",
           icon: "success",
         });
       } else {
-        await api.post("/login", formData);
+        const signInData = await signIn("credentials", {
+          email: formData.email,
+          password: formData.password,
+          redirect: false,
+        });
+        if (signInData?.error) {
+          throw new Error(signInData.error);
+        }
         Swal.fire({
           title: "Berhasil Masuk",
           text: "Selamat datang kembali di TokoTrend",
@@ -123,10 +137,16 @@ const FormAuthComponent: FC<Props> = ({type}) => {
         });
       }
     } catch (err: any) {
-      console.log(err);
+      let message: string = err?.message || "Terjadi kesalahan tidak diketahui";
+      if (err?.name === "AxiosError") {
+        const errMessage = err?.response?.data?.message || "";
+        if (errMessage) {
+          message = errMessage;
+        }
+      }
       Swal.fire({
-        title: "Gagal",
-        text: isSignUp ? "Gagal membuat akun" : "Gagal masuk",
+        title: `Gagal ${isSignUp ? "Membuat Akun" : "Masuk"}`,
+        text: message,
         icon: "error",
       });
     }
