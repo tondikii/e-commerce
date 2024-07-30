@@ -1,5 +1,5 @@
 import type {FC} from "react";
-import {Button} from "@mui/joy";
+import {Button, CircularProgress} from "@mui/joy";
 import {SxProps} from "@mui/joy/styles/types";
 
 interface Props {
@@ -7,6 +7,8 @@ interface Props {
   children: string | JSX.Element;
   size?: "lg" | "sm" | "md";
   type?: string;
+  loading?: boolean;
+  disabled?: boolean;
 }
 
 const customSx = {
@@ -26,9 +28,25 @@ const StyledButton: FC<Props> = ({
   children,
   type,
   size = "lg",
+  loading,
+  disabled,
 }) => {
+  let usedSx: SxProps = sx ? {...sx} : {...customSx};
+
+  if (disabled || loading) {
+    usedSx = {...usedSx, cursor: "not-allowed", border: "1px solid black"};
+  }
+
   return (
-    <Button size={size} sx={sx} type={type}>
+    <Button
+      size={size}
+      sx={usedSx}
+      type={type}
+      loading={loading}
+      loadingPosition="end"
+      loadingIndicator={<CircularProgress color="neutral" />}
+      disabled={disabled || loading}
+    >
       {children}
     </Button>
   );

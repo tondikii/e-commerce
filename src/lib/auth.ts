@@ -5,6 +5,7 @@ import {bcrypt, prisma} from "./";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
   session: {strategy: "jwt"},
   pages: {signIn: "/sign-in"},
   providers: [
@@ -57,4 +58,15 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  callbacks: {
+    async jwt({token, user}) {
+      if (user) {
+        return {...token, ...user};
+      }
+      return token;
+    },
+    async session({session, token}) {
+      return {...session, user: {...session?.user, name: token?.name}};
+    },
+  },
 };

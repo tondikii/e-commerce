@@ -52,6 +52,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
   const usedInitialForm = isSignUp ? initialFormSignUp : initialFormSignIn;
   const [formData, setFormData] = useState<FormAuthType>(usedInitialForm);
   const [submitted, setSubmitted] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const phonNumberWithCode: string = `+62${formData?.phoneNumber}`;
 
@@ -107,12 +108,14 @@ const FormAuthComponent: FC<Props> = ({type}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData, submitted]);
 
-  const onSubmit = async () => {
+  const onSubmitForm = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setSubmitted(true);
     if (!isValidForm) {
       return;
     }
     try {
+      setLoading(true);
       if (isSignUp) {
         await api.post("/user", {...formData, phoneNumber: phonNumberWithCode});
         router.push("/sign-in");
@@ -130,6 +133,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
         if (signInData?.error) {
           throw new Error(signInData.error);
         }
+        router.push("/cart");
         Swal.fire({
           title: "Berhasil Masuk",
           text: "Selamat datang kembali di TokoTrend",
@@ -149,12 +153,9 @@ const FormAuthComponent: FC<Props> = ({type}) => {
         text: message,
         icon: "error",
       });
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const onSubmitForm = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onSubmit();
   };
 
   useEffect(() => {
@@ -237,7 +238,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
               />
             </>
           )}
-          <StyledButton type="submit">
+          <StyledButton type="submit" loading={loading}>
             {isSignUp ? "BUAT AKUN" : "MASUK"}
           </StyledButton>
           {isSignUp ? (
