@@ -3,6 +3,6 @@ import axios from "axios";
 
 export const api = axios.create({
   baseURL: BASE_URL_API_LOCAL,
-  timeout: 1000,
+  timeout: 325000,
   headers: {"X-Requested-With": "XMLHttpRequest"},
 });
