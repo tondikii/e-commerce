@@ -4,3 +4,6 @@ export {default as StyledTextarea} from "./StyledTextarea";
 export {default as FormControl} from "./FormControl";
 export {default as FormAuth} from "./FormAuth";
 export {default as StyledButton} from "./StyledButton";
+export {default as Banner} from "./Banner";
+export {default as HtmlTooltip} from "./HtmlTooltip";
+export {default as PasswordMeter} from "./PasswordMeter";

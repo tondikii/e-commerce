@@ -4,7 +4,7 @@ import {SxProps} from "@mui/joy/styles/types";
 
 interface Props {
   sx?: SxProps;
-  children: string | JSX.Element;
+  children: string | React.ReactNode;
   size?: "lg" | "sm" | "md";
   type?: string;
   loading?: boolean;

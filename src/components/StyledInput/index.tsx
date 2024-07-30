@@ -12,8 +12,9 @@ interface Props {
   sx?: SxProps;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  startDecorator?: JSX.Element;
+  startDecorator?: React.ReactNode;
   errorMessage?: string;
+  endDecorator?: React.ReactNode;
 }
 
 const customSx = {
@@ -38,6 +39,7 @@ const StyledInput: FC<Props> = ({
   onChange,
   startDecorator,
   errorMessage,
+  endDecorator,
 }) => {
   return (
     <FormControl label={label} errorMessage={errorMessage}>
@@ -50,6 +52,7 @@ const StyledInput: FC<Props> = ({
         value={value}
         onChange={onChange}
         startDecorator={startDecorator}
+        endDecorator={endDecorator}
       />
     </FormControl>
   );

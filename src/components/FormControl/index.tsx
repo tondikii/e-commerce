@@ -8,7 +8,7 @@ import type {FC} from "react";
 
 interface Props {
   label?: string;
-  children: JSX.Element;
+  children: React.ReactNode;
   errorMessage?: string;
 }
 

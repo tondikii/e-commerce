@@ -3,8 +3,14 @@
 import {useState, FC, useMemo, useEffect} from "react";
 import {api} from "@/lib/axios";
 import Swal from "sweetalert2";
-import {Key, Mail} from "@mui/icons-material";
-import {StyledInput, Select, StyledTextarea, StyledButton} from "@/components";
+import {Key, Mail, Visibility, VisibilityOff} from "@mui/icons-material";
+import {
+  StyledInput,
+  Select,
+  StyledTextarea,
+  StyledButton,
+  PasswordMeter,
+} from "@/components";
 import Link from "next/link";
 import {
   CITY_OPTIONS,
@@ -16,6 +22,7 @@ import {CustomTargetType} from "@/types";
 import {validateEmailFormat, validatePhoneNumber} from "@/utils";
 import {useRouter} from "next/navigation";
 import {signIn} from "next-auth/react";
+import {IconButton} from "@mui/joy";
 
 interface Props {
   type: "sign-up" | "sign-in";
@@ -53,6 +60,8 @@ const FormAuthComponent: FC<Props> = ({type}) => {
   const [formData, setFormData] = useState<FormAuthType>(usedInitialForm);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isStrongPassword, setIsStrongPassword] = useState<boolean>(true);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const phonNumberWithCode: string = `+62${formData?.phoneNumber}`;
 
@@ -111,7 +120,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
   const onSubmitForm = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitted(true);
-    if (!isValidForm) {
+    if (!isValidForm || (isSignUp && !isStrongPassword)) {
       return;
     }
     try {
@@ -158,6 +167,17 @@ const FormAuthComponent: FC<Props> = ({type}) => {
     }
   };
 
+  const toggleShowPassword = () => setShowPassword(!showPassword);
+
+  const renderVisibilityPassword = () => {
+    const sx = {color: "#626b74"};
+    return (
+      <IconButton onClick={toggleShowPassword}>
+        {showPassword ? <Visibility sx={sx} /> : <VisibilityOff sx={sx} />}
+      </IconButton>
+    );
+  };
+
   useEffect(() => {
     return () => {
       setFormData(usedInitialForm);
@@ -166,8 +186,8 @@ const FormAuthComponent: FC<Props> = ({type}) => {
   }, []);
 
   return (
-    <div className="flex justify-center items-center min-height-screen min-width-screen">
-      <div className="flex flex-col justify-center items-center bg-secondary rounded-xl w-2/6 p-8 m-12">
+    <div className="w-full flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center p-8 w-2/3">
         <h1 className="text-3xl font-montserrat font-bold mb-4">
           {isSignUp ? "BUAT AKUN" : "MASUK"}
         </h1>
@@ -197,12 +217,18 @@ const FormAuthComponent: FC<Props> = ({type}) => {
             onChange={onChange}
             name="password"
             errorMessage={errorsForm.password}
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Masukkan kata sandi..."
             startDecorator={<Key />}
+            endDecorator={renderVisibilityPassword()}
           />
+
           {isSignUp && (
             <>
+              <PasswordMeter
+                password={formData?.password}
+                setIsStrong={setIsStrongPassword}
+              />
               <StyledInput
                 label="Nomor Telepon"
                 value={formData.phoneNumber || ""}

@@ -55,3 +55,7 @@ body {
 .min-width-screen {
   min-width: 100vw !important;
 }
+
+.w-094 {
+  width: 94%;
+}
