@@ -27,6 +27,8 @@ export const ROLE_ADMIN = "admin";
 export const ROLE_CUSTOMER = "customer";
 
 export const BASE_URL_API_LOCAL = "/api";
+export const ENDPOINT_PRODUCT = "/product";
+export const ENDPOINT_CATEGORY = "/category";
 
 export const MAX_VARCHAR_LENGTH = 255;
 
@@ -34,3 +36,11 @@ export const CITY_OPTIONS = [...cities].map((city) => ({
   label: city,
   value: city,
 }));
+
+export const DEFAULT_LIMIT = 5;
+export const DEFAULT_OFFSET = 0;
+export const DEFAULT_PAGE = 1;
+export const DEFAULT_STYLE_ID = 1;
+export const DEFAULT_CATEGORY_ID = 1;
+
+export const STATUS_AUTHENTICATED = "authenticated";

@@ -13,6 +13,7 @@ interface Props {
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   errorMessage?: string;
   minRows?: number;
+  maxLength?: number;
 }
 
 const customSx = {
@@ -36,7 +37,16 @@ const StyledTextarea: FC<Props> = ({
   onChange,
   errorMessage,
   minRows = 2,
+  maxLength = 255, // Default max length
 }) => {
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (maxLength && e.target.value.length > maxLength) {
+      e.target.value = e.target.value.slice(0, maxLength);
+    }
+    onChange(e);
+  }
+
   return (
     <FormControl label={label} errorMessage={errorMessage}>
       <Textarea
@@ -45,7 +55,7 @@ const StyledTextarea: FC<Props> = ({
         sx={sx}
         size={size}
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         minRows={minRows}
       />
     </FormControl>

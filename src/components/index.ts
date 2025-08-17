@@ -7,3 +7,5 @@ export {default as StyledButton} from "./StyledButton";
 export {default as Banner} from "./Banner";
 export {default as HtmlTooltip} from "./HtmlTooltip";
 export {default as PasswordMeter} from "./PasswordMeter";
+export {default as Provider} from "./Provider";
+export {default as Layout} from "./Layout";

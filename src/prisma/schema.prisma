@@ -6,67 +6,110 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
 model User {
-  id              Int      @id @default(autoincrement())
-  name            String   @db.VarChar(50)
-  email           String   @db.VarChar(50) @unique
-  password        String   @db.VarChar(60) // hashed password with bcrypt characters length become 60
-  phoneNumber     String   @db.VarChar(15)
-  role            String   @db.VarChar(10)
-  address         String?  @db.VarChar(255)
-  city            String?  @db.VarChar(50)
-  postalCode      String?  @db.VarChar(5)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id              Int              @id @default(autoincrement())
+  name            String           @db.VarChar(50)
+  email           String           @db.VarChar(50) @unique
+  password        String           @db.VarChar(60) // hashed password with bcrypt characters length become 60
+  phoneNumber     String           @db.VarChar(15)
+  role            String           @db.VarChar(10)
+  address         String?          @db.VarChar(255)
+  city            String?          @db.VarChar(50)
+  postalCode      String?          @db.VarChar(5)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   carts           Cart[]
   productRatings  ProductRating[]
 }
 
 model Size {
-  id        Int     @id @default(autoincrement())
-  name      String  @db.VarChar(10) @unique
-  code      String  @db.VarChar(5)  @unique
-  products  Product[]
+  id            Int           @id @default(autoincrement())
+  name          String        @db.VarChar(10) @unique
+  code          String        @db.VarChar(5)  @unique
+  productUnits  ProductUnit[]
 }
 
 model Color {
-  id        Int     @id @default(autoincrement())
-  name      String  @db.VarChar(15) @unique
-  hexCode   String  @db.VarChar(7)  @unique
-  products  Product[]
+  id              Int             @id @default(autoincrement())
+  name            String          @db.VarChar(15) @unique
+  hexCode         String          @db.VarChar(7)  @unique
+  productUnits    ProductUnit[]
+  productImages   ProductImage[]
+}
+
+model Category {
+  id              Int        @id @default(autoincrement())
+  name            String     @db.VarChar(15) @unique
+  products        Product[]
+}
+
+model Style {
+  id              Int        @id @default(autoincrement())
+  name            String     @db.VarChar(15) @unique
+  products        Product[]
 }
 
 model Product {
-  id              Int     @id @default(autoincrement())
-  name            String  @db.VarChar(50)
-  description     String  @db.VarChar(255)
-  images          String[]
+  id              Int              @id @default(autoincrement())
+  name            String           @db.VarChar(50) @unique
+  description     String           @db.VarChar(255)
   price           Int
   discount        Int?
-  quantity        Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  size            Size    @relation(fields: [sizeId], references: [id])
-  sizeId          Int
-  color           Color   @relation(fields: [colorId], references: [id])
-  colorId         Int
-  carts           Cart[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  productImages   ProductImage[]
+  productUnits    ProductUnit[]
   productRatings  ProductRating[]
+
+  category        Category         @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  categoryId      Int
+
+  style           Style            @relation(fields: [styleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  styleId         Int
+}
+
+model ProductImage {
+  id              Int      @id @default(autoincrement())
+  url             String   @unique
+
+  product         Product  @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productId       Int
+
+  color           Color    @relation(fields: [colorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  colorId         Int
+}
+
+model ProductUnit {
+  id              Int      @id @default(autoincrement())
+  quantity        Int
+
+  product         Product  @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productId       Int
+
+  size            Size     @relation(fields: [sizeId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  sizeId          Int
+
+  color           Color    @relation(fields: [colorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  colorId         Int
+
+  carts           Cart[]
 }
 
 model Cart {
-  id          Int     @id @default(autoincrement())
-  quantity    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User @relation(fields: [userId], references: [id])
-  userId      Int
-  product     Product @relation(fields: [productId], references: [id])
-  productId   Int
+  id              Int          @id @default(autoincrement())
+  quantity        Int
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user            User         @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId          Int
+
+  productUnit     ProductUnit  @relation(fields: [productUnitId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productUnitId   Int
 }
 
 model ProductRating {
@@ -75,8 +118,10 @@ model ProductRating {
   comment     String?  @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  user        User @relation(fields: [userId], references: [id])
+
+  user        User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId      Int
-  product     Product @relation(fields: [productId], references: [id])
+
+  product     Product  @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   productId   Int
 }

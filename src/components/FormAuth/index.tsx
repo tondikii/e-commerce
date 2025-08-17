@@ -23,6 +23,7 @@ import {validateEmailFormat, validatePhoneNumber} from "@/utils";
 import {useRouter} from "next/navigation";
 import {signIn} from "next-auth/react";
 import {IconButton} from "@mui/joy";
+import {useRedirectIfAuthenticated} from "@/hooks";
 
 interface Props {
   type: "sign-up" | "sign-in";
@@ -55,6 +56,9 @@ const initialFormSignUp: FormAuthType = {
 const FormAuthComponent: FC<Props> = ({type}) => {
   const router = useRouter();
 
+  // direct to home if have session
+  useRedirectIfAuthenticated();
+
   const isSignUp: boolean = type === "sign-up";
   const usedInitialForm = isSignUp ? initialFormSignUp : initialFormSignIn;
   const [formData, setFormData] = useState<FormAuthType>(usedInitialForm);
@@ -71,15 +75,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
       | React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     const {name, value} = e.target;
-    let maxLength: number = MAX_VARCHAR_LENGTH;
-    if (name === "postalCode") {
-      maxLength = 5;
-    }
-    if (value?.length <= maxLength) {
       setFormData({...formData, [name]: value});
-    } else {
-      setFormData({...formData, [name]: value.slice(0, maxLength)});
-    }
   };
 
   const onChangeSelect = (target: CustomTargetType) => {
@@ -261,6 +257,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
                 name="postalCode"
                 errorMessage={errorsForm.postalCode}
                 placeholder="Masukkan kode pos..."
+                maxLength={5}
               />
             </>
           )}
