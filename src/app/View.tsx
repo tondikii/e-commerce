@@ -1,37 +1,40 @@
 "use client";
 
-import {ENDPOINT_PRODUCT} from "@/constants";
-import {useFetch, useSearchParams} from "@/hooks";
-import {FetchedProducts, FetchProductsParams} from "@/types";
-import {useRouter} from "next/navigation";
-import {useState, type FC} from "react";
+// import {ENDPOINT_PRODUCT} from "@/constants";
+// import {useFetch, useSearchParams} from "@/hooks";
+// import {FetchedProducts, FetchProductsParams} from "@/types";
+// import {useRouter} from "next/navigation";
+import {
+  // useState,
+  type FC,
+} from "react";
 
 interface ViewProps {}
 
 const View: FC<ViewProps> = ({}) => {
-  const router = useRouter();
+  // const router = useRouter();
 
-  const {searchParams, setSearchParams, urlSearchParams} =
-    useSearchParams(router);
+  // const {searchParams, setSearchParams, urlSearchParams} =
+  //   useSearchParams(router);
 
-  const [refetch, setRefetch] = useState<boolean>(false);
+  // const [refetch, setRefetch] = useState<boolean>(false);
 
-  const refetchData = () => {
-    setRefetch(true);
-  };
+  // const refetchData = () => {
+  //   setRefetch(true);
+  // };
 
-  const searchParamsObject: FetchProductsParams = Object.fromEntries(
-    searchParams.entries()
-  );
+  // const searchParamsObject: FetchProductsParams = Object.fromEntries(
+  //   searchParams.entries()
+  // );
 
-  const fetchProductsParams = {...searchParamsObject};
+  // const fetchProductsParams = {...searchParamsObject};
 
-  const fetchedProducts: FetchedProducts = useFetch(ENDPOINT_PRODUCT, {
-    params: fetchProductsParams,
-    refetch,
-    setRefetch,
-    // prevent,
-  });
+  // const fetchedProducts: FetchedProducts = useFetch(ENDPOINT_PRODUCT, {
+  //   params: fetchProductsParams,
+  //   refetch,
+  //   setRefetch,
+  //   // prevent,
+  // });
 
   return (
     <div>
