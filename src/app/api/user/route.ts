@@ -1,6 +1,7 @@
 import {type Prisma} from "@prisma/client";
 import {NextResponse} from "next/server";
-import {bcrypt, prisma} from "@/lib";
+import prisma from "@/lib/prisma";
+import {hashPassword} from "@/lib/password";
 import {
   ERROR_PRISMA_VALIDATION,
   RESPONSE_MESSAGE_BAD_REQUEST,
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     if (!body.role) {
       body.role = ROLE_CUSTOMER;
     }
-    body.password = await bcrypt.hashPassword(body.password);
+    body.password = await hashPassword(body.password);
     const user = await prisma.user.create({data: body});
     return NextResponse.json({user}, {status: RESPONSE_STATUS_CREATED});
   } catch (err: any) {

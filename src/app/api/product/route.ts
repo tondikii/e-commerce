@@ -1,5 +1,5 @@
 import {NextResponse} from "next/server";
-import {prisma} from "@/lib";
+import prisma from "@/lib/prisma";
 import {
   DEFAULT_CATEGORY_ID,
   DEFAULT_LIMIT,

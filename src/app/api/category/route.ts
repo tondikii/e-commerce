@@ -1,5 +1,5 @@
 import {NextResponse} from "next/server";
-import {prisma} from "@/lib";
+import prisma from "@/lib/prisma";
 import {
   RESPONSE_STATUS_INTERNAL_SERVER_ERROR,
   RESPONSE_STATUS_OK,
