@@ -1,10 +1,9 @@
 import {ReactNode} from "react";
+import {Product, Products} from "./product";
+import {Categories} from "./category";
 
-// custom event.target component Select @mui/joy
-export interface CustomTargetType {
-  name: string;
-  value: string | number;
-}
+export * from "./product";
+export * from "./category";
 
 // custom event.target component Select @mui/joy
 export interface CustomTargetType {
@@ -13,8 +12,11 @@ export interface CustomTargetType {
 }
 
 export interface UserType {
+  id?: number;
   name: string;
   email: string;
+  phoneNumber?: string;
+  createdAt?: string;
 }
 
 export type SessionType = {
@@ -26,7 +28,7 @@ export interface MenuType {
   route: string;
   icon?: ReactNode;
   child?: MenuType[];
-  disabled: boolean;
+  isChildren?: boolean;
 }
 export type MenusType = MenuType[];
 
@@ -42,69 +44,48 @@ export interface Color {
   hexCode: string;
 }
 
-export interface ProductImage {
-  id?: number;
-  url: string;
-  colorId: number;
-}
-
-export interface ProductUnit {
-  id?: number;
-  quantity: number;
-  size: Size;
-  color: Color;
-  sizeId?: number;
-  colorId?: number;
-}
-
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  discount?: number;
-  createdAt: string;
-  updatedAt: string;
-  categoryId: number;
-  styleId: number;
-  productImages?: ProductImage[];
-  productUnits?: ProductUnit[];
-}
-
-export type Products = Product[];
-
-export interface FetchProductsParams {
-  name?: string;
-  page?: number;
-  limit?: number;
-  offset?: number;
-  styleId?: number;
-}
-export interface FetchedProducts {
-  data: {
-    data: Products;
-    totalRecords: number;
-  } | null;
-  loading: boolean;
-  error: any;
-}
-
 export interface ColourOption {
   value: number;
   label: string;
   color: string;
 }
-
-export interface Category {
+export interface Collection {
   id: number;
   name: string;
-  route?: string;
+  products?: Product[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type Categories = Category[];
+export type Collections = Collection[];
 
-export interface FetchedCategories {
-  data: Categories | null;
+export interface BreadCrumbData {
+  name: string;
+  label: string;
+}
+
+export interface FileWithPreview extends File {
+  preview: string;
+}
+
+export interface AuthParamsImageKit {
+  signature: string;
+  expire: number;
+  token: string;
+  publicKey: string;
+}
+
+export interface FetchedDataParams {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface FetchedData {
+  data: {
+    data: Products | Categories | Collections;
+    totalRecords: number;
+  } | null;
   loading: boolean;
   error: any;
 }
