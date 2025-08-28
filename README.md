@@ -1,6 +1,6 @@
 # e-commerce
 
-E-commerce website named TokoTrend using next.js typescript with backend and frontend in the same repository.
+E-commerce website named Rumah Fashion using next.js typescript with backend and frontend in the same repository.
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 

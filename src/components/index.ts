@@ -1,11 +1,13 @@
-export {default as Select} from "./Select";
-export {default as StyledInput} from "./StyledInput";
-export {default as StyledTextarea} from "./StyledTextarea";
-export {default as FormControl} from "./FormControl";
-export {default as FormAuth} from "./FormAuth";
-export {default as StyledButton} from "./StyledButton";
-export {default as Banner} from "./Banner";
-export {default as HtmlTooltip} from "./HtmlTooltip";
-export {default as PasswordMeter} from "./PasswordMeter";
-export {default as Provider} from "./Provider";
-export {default as Layout} from "./Layout";
+export * from "./navigations";
+
+export * from "./wrappers";
+
+export * from "./typography";
+
+export * from "./buttons";
+
+export * from "./inputs";
+
+export * from "./forms";
+
+export * from "./others";

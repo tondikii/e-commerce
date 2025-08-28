@@ -1,9 +1,15 @@
+"use client";
 import type {FC} from "react";
-import View from "./View";
+import {Banner} from "@/components";
 
-interface HomePageProps {}
+interface Props {}
 
-const HomePage: FC<HomePageProps> = ({}) => {
-  return <View />;
+const HomePage: FC<Props> = ({}) => {
+  return (
+    <>
+      <Banner />
+    </>
+  );
 };
+
 export default HomePage;

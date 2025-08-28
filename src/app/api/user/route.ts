@@ -11,7 +11,6 @@ import {
   RESPONSE_STATUS_BAD_REQUEST,
   RESPONSE_STATUS_CREATED,
   RESPONSE_STATUS_INTERNAL_SERVER_ERROR,
-  ROLE_CUSTOMER,
   ERROR_PRISMA_REQUEST,
   RESPONSE_MESSAGE_ERROR_PRISMA_REQUEST,
 } from "@/constants";
@@ -30,9 +29,6 @@ export async function POST(request: Request) {
     const invalidPhoneNumber = !validatePhoneNumber(body.phoneNumber);
     if (invalidPhoneNumber) {
       throw new Error("Format nomor telepon tidak sesuai");
-    }
-    if (!body.role) {
-      body.role = ROLE_CUSTOMER;
     }
     body.password = await hashPassword(body.password);
     const user = await prisma.user.create({data: body});

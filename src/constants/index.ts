@@ -23,12 +23,10 @@ export const REGEX_PHONE_NUMBER_ID = /^(\+62|62|0)8[1-9][0-9]{8,9}$/;
 export const ERROR_PRISMA_VALIDATION = "PrismaClientValidationError";
 export const ERROR_PRISMA_REQUEST = "PrismaClientKnownRequestError";
 
-export const ROLE_ADMIN = "admin";
-export const ROLE_CUSTOMER = "customer";
-
 export const BASE_URL_API_LOCAL = "/api";
 export const ENDPOINT_PRODUCT = "/product";
-export const ENDPOINT_CATEGORY = "/category";
+export const ENDPOINT_CATEGORIES = "/categories";
+export const ENDPOINT_COLLECTIONS = "/collections";
 
 export const MAX_VARCHAR_LENGTH = 255;
 

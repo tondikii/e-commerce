@@ -82,10 +82,7 @@ export interface FetchedDataParams {
 }
 
 export interface FetchedData {
-  data: {
-    data: Products | Categories | Collections;
-    totalRecords: number;
-  } | null;
+  data: Categories | Collections | null;
   loading: boolean;
   error: any;
 }
