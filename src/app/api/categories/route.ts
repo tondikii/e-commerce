@@ -9,7 +9,14 @@ export async function GET() {
   try {
     const categories = await prisma.category.findMany({
       orderBy: {
-        id: "asc",
+        name: "asc",
+      },
+      include: {
+        products: {
+          include: {
+            variants: true,
+          },
+        },
       },
     });
     return NextResponse.json(categories, {status: RESPONSE_STATUS_OK});

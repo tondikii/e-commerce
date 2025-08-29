@@ -49,11 +49,13 @@ const Navbar: FC<props> = ({}) => {
             title="Kategori"
             items={categories}
             sx={{fontWeight: 500}}
+            searchParams="category"
           />
           <SubtitleWithDropdown
             title="Koleksi"
             items={collections}
             sx={{fontWeight: 500}}
+            searchParams="collection"
           />
         </Box>
 

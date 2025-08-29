@@ -1,3 +1,4 @@
+// src/hooks/useFetch.ts
 import {api} from "@/lib/axios";
 import {useState, useEffect, useCallback} from "react";
 
@@ -6,7 +7,9 @@ interface Props {
   prevent?: boolean;
   refetch?: boolean;
   setRefetch?: Function;
+  queryParams?: Record<string, string>;
 }
+
 const useFetch = (
   endpoint: string,
   {
@@ -14,6 +17,7 @@ const useFetch = (
     prevent = false,
     refetch = false,
     setRefetch = () => {},
+    queryParams,
   }: Props | undefined = {}
 ) => {
   const [loading, setLoading] = useState(true);
@@ -28,9 +32,15 @@ const useFetch = (
     };
 
     try {
+      // Gabungkan params dan queryParams
+      const allParams = {
+        ...params,
+        ...queryParams,
+      };
+
       const {data} = await api.get(endpoint, {
         signal: abortController.signal,
-        params,
+        params: allParams,
       });
       setData(data);
       resetState();
@@ -40,7 +50,7 @@ const useFetch = (
         resetState();
       }
     }
-  }, [abortController.signal, endpoint, params, setRefetch]);
+  }, [abortController.signal, endpoint, params, queryParams, setRefetch]);
 
   useEffect(() => {
     if (!prevent) {
@@ -62,6 +72,16 @@ const useFetch = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetch]);
 
+  // Effect untuk refetch ketika queryParams berubah
+  useEffect(() => {
+    if (!prevent) {
+      setLoading(true);
+      getData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(queryParams)]); // Gunakan JSON.stringify untuk compare object
+
   return {data, loading, error};
 };
+
 export default useFetch;

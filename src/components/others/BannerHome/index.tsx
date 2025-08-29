@@ -3,6 +3,7 @@ import type {FC} from "react";
 
 import {Grid, Stack} from "@mui/joy";
 import {StyledButton, Text, TextSecondary, Title} from "@/components";
+import Link from "next/link";
 
 interface Props {}
 
@@ -33,9 +34,8 @@ const Banner: FC<Props> = () => {
               sx={{
                 fontFamily: "Staatliches, sans-serif",
                 fontWeight: 400,
-                // fontSize: 64,
               }}
-              fontSize={{xs: 32, md: 48, lg: 64}}
+              fontSize={{xs: 48, md: 60, lg: 72}}
             >
               TEMUKAN FASHION YANG COCOK DENGAN GAYA MU
             </Title>
@@ -44,23 +44,25 @@ const Banner: FC<Props> = () => {
               cermat, yang dirancang untuk menonjolkan individualitas Anda dan
               memenuhi selera gaya Anda.
             </TextSecondary>
-            <StyledButton
-              size="lg"
-              sx={{
-                borderRadius: "3rem",
-                py: 3,
-                px: 6,
-                "&:hover": {
-                  backgroundColor: "#212b36",
-                },
-                bgcolor: "#212b36",
-                color: "#ffffff",
-              }}
-            >
-              <Text level="body-lg" sx={{fontWeight: 300, color: "#ffffff"}}>
-                Belanja Sekarang
-              </Text>
-            </StyledButton>
+            <Link href="/products">
+              <StyledButton
+                size="lg"
+                sx={{
+                  borderRadius: "3rem",
+                  py: 3,
+                  px: 6,
+                  "&:hover": {
+                    backgroundColor: "#212b36",
+                  },
+                  bgcolor: "#212b36",
+                  color: "#ffffff",
+                }}
+              >
+                <Text level="body-lg" sx={{fontWeight: 300, color: "#ffffff"}}>
+                  Belanja Sekarang
+                </Text>
+              </StyledButton>
+            </Link>
           </Stack>
         </Grid>
         <Grid

@@ -5,21 +5,25 @@ import {useState, useRef, useEffect} from "react";
 import {Box, Sheet, Typography, List, ListItem, ListItemButton} from "@mui/joy";
 import {ExpandMoreRounded} from "@mui/icons-material";
 import type {FC} from "react";
+import Link from "next/link";
 
 interface DropdownItem {
   name: string;
+  id: number;
 }
 
 interface SubtitleWithDropdownProps {
   title: string;
   items: DropdownItem[];
   sx?: any;
+  searchParams: string;
 }
 
 const SubtitleWithDropdown: FC<SubtitleWithDropdownProps> = ({
   title,
   items,
   sx,
+  searchParams,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -40,14 +44,6 @@ const SubtitleWithDropdown: FC<SubtitleWithDropdownProps> = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  const handleItemClick = (item: DropdownItem) => {
-    // Navigate to the appropriate link
-    // if (item.href) {
-    //   window.location.href = item.href;
-    // }
-    setIsOpen(false);
-  };
 
   return (
     <Box
@@ -106,20 +102,21 @@ const SubtitleWithDropdown: FC<SubtitleWithDropdownProps> = ({
             }}
           >
             {items.map((item, index) => (
-              <ListItem key={index} sx={{p: 0}}>
-                <ListItemButton
-                  onClick={() => handleItemClick(item)}
-                  sx={{
-                    px: 2,
-                    py: 1,
-                    "&:hover": {
-                      bgcolor: "primary.softBg",
-                    },
-                  }}
-                >
-                  {item.name}
-                </ListItemButton>
-              </ListItem>
+              <Link key={index} href={`/products?${searchParams}=${item?.id}`}>
+                <ListItem sx={{p: 0}}>
+                  <ListItemButton
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      "&:hover": {
+                        bgcolor: "primary.softBg",
+                      },
+                    }}
+                  >
+                    {item.name}
+                  </ListItemButton>
+                </ListItem>
+              </Link>
             ))}
           </List>
         </Sheet>
