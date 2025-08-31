@@ -1,16 +1,13 @@
 "use client";
 
 import {FC} from "react";
-import {SessionType} from "@/types";
 import Image from "next/image";
 import {Typography} from "@mui/joy";
 import Link from "next/link";
-interface Props {
-  session: SessionType;
-}
+interface Props {}
 
 // eslint-disable-next-line @next/next/no-async-client-component
-const NotFoundPage: FC<Props> = ({session}) => {
+const NotFoundPage: FC<Props> = () => {
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center pb-8">
       <Image
