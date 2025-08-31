@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useEffect} from "react";
+import {useState, useEffect, Suspense} from "react";
 import {
   Box,
   Container,
@@ -29,9 +29,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import {useCheckout} from "@/hooks/useCheckout";
-import {useSession} from "next-auth/react";
 import {formatCurrency} from "@/utils";
 import {useSearchParams} from "next/navigation";
+import {PageLoader} from "@/components";
 
 // Payment method options
 const PAYMENT_METHODS = [
@@ -75,7 +75,6 @@ const PAYMENT_METHODS = [
 ];
 
 const CheckoutPage = () => {
-  const {data: session} = useSession();
   const searchParams = useSearchParams();
   const {loading, error, getCheckoutData, createOrder} = useCheckout();
   const [checkoutData, setCheckoutData] = useState<any>(null);
@@ -130,13 +129,7 @@ const CheckoutPage = () => {
   }, [searchParams]);
 
   if (loading) {
-    return (
-      <Container maxWidth="lg" sx={{py: 4}}>
-        <Box sx={{textAlign: "center", py: 8}}>
-          <Typography level="h4">Memuat checkout...</Typography>
-        </Box>
-      </Container>
-    );
+    return <PageLoader />;
   }
 
   if (error) {
@@ -159,7 +152,7 @@ const CheckoutPage = () => {
   }
 
   return (
-    <>
+    <Suspense fallback={<PageLoader />}>
       <Container maxWidth="lg" sx={{py: 4}}>
         <Typography level="h2" sx={{mb: 4, fontWeight: 700}}>
           Checkout
@@ -497,7 +490,7 @@ const CheckoutPage = () => {
           </Button>
         </ModalDialog>
       </Modal>
-    </>
+    </Suspense>
   );
 };
 

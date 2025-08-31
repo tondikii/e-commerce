@@ -4,8 +4,6 @@ import "./globals.css";
 import clsx from "clsx";
 import {Layout, Provider} from "@/components";
 import MasterDataContextProvider from "@/store/MasterDataProvider";
-import {Suspense} from "react";
-import {PageLoader} from "@/components";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -24,10 +22,7 @@ export default async function RootLayout({
       <body className={clsx(inter.className, "bg-white")}>
         <Provider>
           <MasterDataContextProvider>
-            <Layout>
-              {/* Global Suspense boundary untuk mengatasi useSearchParams() */}
-              <Suspense fallback={<PageLoader />}>{children}</Suspense>
-            </Layout>
+            <Layout>{children}</Layout>
           </MasterDataContextProvider>
         </Provider>
       </body>
