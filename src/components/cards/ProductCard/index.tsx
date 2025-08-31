@@ -1,8 +1,7 @@
-// src/components/ProductCard/index.tsx
 "use client";
 
 import {useState} from "react";
-import {Box, Card, CardContent, Typography, Button} from "@mui/joy";
+import {Box, Card, CardContent, Typography, Chip} from "@mui/joy";
 import Image from "next/image";
 import {alpha} from "@mui/system";
 
@@ -21,6 +20,12 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Cek jika produk habis
+  const isOutOfStock = product.variants.every((v: any) => v.stock === 0);
+  const lowStock = product.variants.some(
+    (v: any) => v.stock > 0 && v.stock <= 2
+  );
 
   const handleCardClick = () => {
     window.location.href = `/products/${product.id}`;
@@ -44,7 +49,7 @@ const ProductCard = ({
           transform: "translateY(-8px)",
         },
       }}
-      onClick={handleCardClick}
+      onClick={isOutOfStock ? undefined : handleCardClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -112,33 +117,38 @@ const ProductCard = ({
           }}
         />
 
-        {/* Quick View Button (appear on hover) */}
-        <Button
-          variant="solid"
-          size="sm"
-          sx={{
-            position: "absolute",
-            bottom: 12,
-            left: "50%",
-            transform: isHovered
-              ? "translateX(-50%) translateY(0)"
-              : "translateX(-50%) translateY(100%)",
-            opacity: isHovered ? 1 : 0,
-            borderRadius: "lg",
-            fontWeight: 500,
-            px: 3,
-            fontSize: "0.8rem",
-            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-            whiteSpace: "nowrap",
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            // TODO: Quick view modal
-          }}
-          color="neutral"
-        >
-          Beli Sekarang
-        </Button>
+        {/* Stock Status Badge */}
+        {isOutOfStock && (
+          <Chip
+            color="danger"
+            variant="solid"
+            size="sm"
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              fontWeight: 600,
+            }}
+          >
+            Habis
+          </Chip>
+        )}
+
+        {lowStock && !isOutOfStock && (
+          <Chip
+            color="warning"
+            variant="solid"
+            size="sm"
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              fontWeight: 600,
+            }}
+          >
+            Stok Terbatas
+          </Chip>
+        )}
       </Box>
 
       {/* Content Container dengan flex grow untuk konsistensi */}

@@ -1,8 +1,6 @@
 "use client";
 import type {FC} from "react";
 
-// import styles from "./styles.module.css";
-import clsx from "clsx";
 import {Stack} from "@mui/joy";
 
 interface Props {
@@ -25,7 +23,7 @@ const AuthContainer: FC<Props> = ({children}) => {
       <img
         src="/banner.png"
         alt="banner"
-        className="h-1/4 lg:w-1/2 lg:h-auto absolute lg:static left-0 bottom-0 self-end"
+        className="hidden md:block absolute h-1/4 lg:w-1/2 lg:h-auto lg:static left-0 bottom-0 self-end"
       />
     </div>
   );

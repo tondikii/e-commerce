@@ -31,15 +31,7 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    // Build orderBy
-    let orderBy: any = {createdAt: "desc"};
-
-    if (sortBy === "price-low") {
-      orderBy = {variants: {_min: {price: "asc"}}};
-    } else if (sortBy === "price-high") {
-      orderBy = {variants: {_min: {price: "desc"}}};
-    }
-
+    // Ambil semua produk
     const products = await prisma.product.findMany({
       where,
       include: {
@@ -50,14 +42,12 @@ export async function GET(request: NextRequest) {
         reviews: {
           include: {
             user: {
-              select: {
-                name: true,
-              },
+              select: {name: true},
             },
           },
         },
       },
-      orderBy,
+      orderBy: sortBy === "newest" ? {createdAt: "desc"} : undefined,
     });
 
     // Filter by price range
@@ -67,10 +57,26 @@ export async function GET(request: NextRequest) {
       const max = maxPrice ? parseInt(maxPrice) : 10000000;
 
       filteredProducts = products.filter((product) => {
+        if (product.variants.length === 0) return false;
         const minProductPrice = Math.min(
           ...product.variants.map((v) => v.price)
         );
         return minProductPrice >= min && minProductPrice <= max;
+      });
+    }
+
+    // Sorting manual by variant price
+    if (sortBy === "price-low") {
+      filteredProducts = filteredProducts.sort((a, b) => {
+        const minA = Math.min(...a.variants.map((v) => v.price));
+        const minB = Math.min(...b.variants.map((v) => v.price));
+        return minA - minB;
+      });
+    } else if (sortBy === "price-high") {
+      filteredProducts = filteredProducts.sort((a, b) => {
+        const minA = Math.min(...a.variants.map((v) => v.price));
+        const minB = Math.min(...b.variants.map((v) => v.price));
+        return minB - minA;
       });
     }
 

@@ -1,8 +1,7 @@
-// src/app/products/page.tsx
 "use client";
 
 import type {FC} from "react";
-import {useState, useEffect} from "react";
+import {useState, useEffect, useCallback, useMemo} from "react";
 import {
   Box,
   Container,
@@ -24,6 +23,7 @@ import {ProductCard, TextSecondary} from "@/components";
 import {useFetch} from "@/hooks";
 import {Product, Category, Collection} from "@prisma/client";
 import {useRouter, useSearchParams} from "next/navigation";
+import {formatCurrency} from "@/utils";
 
 interface ProductsPageProps {}
 
@@ -42,16 +42,20 @@ const ProductsPage: FC<ProductsPageProps> = ({}) => {
   const [filteredProducts, setFilteredProducts] = useState<
     ProductWithRelations[]
   >([]);
+
+  // State untuk filter - langsung dari URL params
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
   const [sortBy, setSortBy] = useState<string>("newest");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Parse query parameters from URL on initial load
+  // Parse query parameters dari URL hanya sekali pada initial load
   useEffect(() => {
-    const categoryParams = searchParams.get("category")?.split(",") || [];
-    const collectionParams = searchParams.get("collection")?.split(",") || [];
+    const categoryParams =
+      searchParams.get("category")?.split(",").filter(Boolean) || [];
+    const collectionParams =
+      searchParams.get("collection")?.split(",").filter(Boolean) || [];
     const minPrice = searchParams.get("minPrice")
       ? parseInt(searchParams.get("minPrice")!)
       : 0;
@@ -66,34 +70,99 @@ const ProductsPage: FC<ProductsPageProps> = ({}) => {
     setPriceRange([minPrice, maxPrice]);
     setSortBy(sort);
     setSearchQuery(search);
-  }, [searchParams]);
+  }, [searchParams]); // Hanya depend on searchParams
 
-  // Build query parameters for API
-  const queryParams: Record<string, string> = {};
+  // Build query parameters untuk API menggunakan useMemo
+  const queryParams = useMemo(() => {
+    const params: Record<string, string> = {};
 
-  if (selectedCategories.length > 0) {
-    queryParams.category = selectedCategories.join(",");
-  }
+    if (selectedCategories.length > 0) {
+      params.category = selectedCategories.join(",");
+    }
 
-  if (selectedCollections.length > 0) {
-    queryParams.collection = selectedCollections.join(",");
-  }
+    if (selectedCollections.length > 0) {
+      params.collection = selectedCollections.join(",");
+    }
 
-  if (priceRange[0] > 0) {
-    queryParams.minPrice = priceRange[0].toString();
-  }
+    if (priceRange[0] > 0) {
+      params.minPrice = priceRange[0].toString();
+    }
 
-  if (priceRange[1] < 10000000) {
-    queryParams.maxPrice = priceRange[1].toString();
-  }
+    if (priceRange[1] < 10000000) {
+      params.maxPrice = priceRange[1].toString();
+    }
 
-  if (searchQuery) {
-    queryParams.search = searchQuery;
-  }
+    if (searchQuery) {
+      params.search = searchQuery;
+    }
 
-  queryParams.sort = sortBy;
+    params.sort = sortBy;
 
-  // Update URL with current filters
+    return params;
+  }, [
+    selectedCategories,
+    selectedCollections,
+    priceRange,
+    searchQuery,
+    sortBy,
+  ]);
+
+  // Fetch data dengan query parameters
+  const {data: productsData, loading: productsLoading}: any = useFetch(
+    "/products",
+    {queryParams}
+  );
+
+  const {data: categoriesData}: any = useFetch("/categories");
+  const {data: collectionsData}: any = useFetch("/collections");
+
+  // Set filtered products dari API
+  useEffect(() => {
+    if (productsData) {
+      setFilteredProducts(productsData);
+    }
+  }, [productsData]);
+
+  // Handler functions dengan useCallback
+  const handleCategoryChange = useCallback((categoryId: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  }, []);
+
+  const handleCollectionChange = useCallback((collectionId: string) => {
+    setSelectedCollections((prev) =>
+      prev.includes(collectionId)
+        ? prev.filter((id) => id !== collectionId)
+        : [...prev, collectionId]
+    );
+  }, []);
+
+  const clearFilters = useCallback(() => {
+    setSelectedCategories([]);
+    setSelectedCollections([]);
+    setPriceRange([0, 10000000]);
+    setSortBy("newest");
+    setSearchQuery("");
+
+    // Redirect ke URL tanpa parameters
+    router.replace("/products", {scroll: false});
+  }, [router]);
+
+  const hasActiveFilters = useMemo(
+    () =>
+      selectedCategories.length > 0 ||
+      selectedCollections.length > 0 ||
+      priceRange[0] > 0 ||
+      priceRange[1] < 10000000 ||
+      searchQuery ||
+      sortBy !== "newest",
+    [selectedCategories, selectedCollections, priceRange, searchQuery, sortBy]
+  );
+
+  // Update URL ketika filter berubah - tanpa menyebabkan re-render loop
   useEffect(() => {
     const params = new URLSearchParams();
 
@@ -119,7 +188,13 @@ const ProductsPage: FC<ProductsPageProps> = ({}) => {
 
     params.set("sort", sortBy);
 
-    router.replace(`/products?${params.toString()}`, {scroll: false});
+    // Only update URL if it's different from current
+    const currentUrl = `?${searchParams.toString()}`;
+    const newUrl = `?${params.toString()}`;
+
+    if (currentUrl !== newUrl) {
+      router.replace(`/products?${params.toString()}`, {scroll: false});
+    }
   }, [
     selectedCategories,
     selectedCollections,
@@ -127,68 +202,8 @@ const ProductsPage: FC<ProductsPageProps> = ({}) => {
     sortBy,
     searchQuery,
     router,
+    searchParams,
   ]);
-
-  // Fetch data dengan query parameters
-  const {data: productsData, loading: productsLoading}: any = useFetch(
-    "/products",
-    {queryParams}
-  );
-
-  const {data: categoriesData}: any = useFetch("/categories");
-  const {data: collectionsData}: any = useFetch("/collections");
-
-  // Set filtered products dari API
-  useEffect(() => {
-    if (productsData) {
-      setFilteredProducts(productsData);
-    }
-  }, [productsData]);
-
-  const handleCategoryChange = (categoryId: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  };
-
-  const handleCollectionChange = (collectionId: string) => {
-    setSelectedCollections((prev) =>
-      prev.includes(collectionId)
-        ? prev.filter((id) => id !== collectionId)
-        : [...prev, collectionId]
-    );
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Search is handled automatically through the useEffect
-  };
-
-  const clearFilters = () => {
-    setSelectedCategories([]);
-    setSelectedCollections([]);
-    setPriceRange([0, 10000000]);
-    setSortBy("newest");
-    setSearchQuery("");
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const hasActiveFilters =
-    selectedCategories.length > 0 ||
-    selectedCollections.length > 0 ||
-    priceRange[0] > 0 ||
-    priceRange[1] < 10000000 ||
-    searchQuery ||
-    sortBy !== "newest";
 
   if (productsLoading) {
     return (
@@ -348,28 +363,18 @@ const ProductsPage: FC<ProductsPageProps> = ({}) => {
                       key={categoryId}
                       variant="soft"
                       color="neutral"
+                      onClick={() => handleCategoryChange(categoryId)}
                       sx={{
                         borderRadius: "lg",
                         fontWeight: 600,
-                        "& .MuiChip-deleteButton": {
-                          color: "neutral.500",
-                          "&:hover": {
-                            color: "neutral.600",
-                          },
+                        cursor: "pointer",
+                        "&:hover": {
+                          bgcolor: "neutral.300",
                         },
                       }}
-                      endDecorator={
-                        <IconButton
-                          size="sm"
-                          variant="plain"
-                          color="neutral"
-                          onClick={() => handleCategoryChange(categoryId)}
-                        >
-                          <CloseRounded />
-                        </IconButton>
-                      }
                     >
                       {category.name}
+                      <CloseRounded sx={{ml: 0.5, fontSize: "1rem"}} />
                     </Chip>
                   ) : null;
                 })}
@@ -382,28 +387,18 @@ const ProductsPage: FC<ProductsPageProps> = ({}) => {
                       key={collectionId}
                       variant="soft"
                       color="neutral"
+                      onClick={() => handleCollectionChange(collectionId)}
                       sx={{
                         borderRadius: "lg",
                         fontWeight: 600,
-                        "& .MuiChip-deleteButton": {
-                          color: "neutral.500",
-                          "&:hover": {
-                            color: "neutral.600",
-                          },
+                        cursor: "pointer",
+                        "&:hover": {
+                          bgcolor: "neutral.300",
                         },
                       }}
-                      endDecorator={
-                        <IconButton
-                          size="sm"
-                          variant="plain"
-                          color="neutral"
-                          onClick={() => handleCollectionChange(collectionId)}
-                        >
-                          <CloseRounded />
-                        </IconButton>
-                      }
                     >
-                      {collection?.name}
+                      {collection.name}
+                      <CloseRounded sx={{ml: 0.5, fontSize: "1rem"}} />
                     </Chip>
                   ) : null;
                 })}
@@ -478,9 +473,7 @@ const ProductsPage: FC<ProductsPageProps> = ({}) => {
           {/* Products Grid */}
           <Grid xs={12} md={9}>
             {/* Results Count */}
-            <TextSecondary
-              sx={{mb: 3}}
-            >
+            <TextSecondary sx={{mb: 3}}>
               Menampilkan {filteredProducts.length} produk
               {hasActiveFilters && " yang sesuai dengan filter"}
             </TextSecondary>

@@ -1,4 +1,3 @@
-import {BASE_URL_API_LOCAL} from "@/constants";
 import axios from "axios";
 
 export const api = axios.create({

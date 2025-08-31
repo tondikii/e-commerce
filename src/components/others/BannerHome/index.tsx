@@ -35,7 +35,7 @@ const Banner: FC<Props> = () => {
                 fontFamily: "Staatliches, sans-serif",
                 fontWeight: 400,
               }}
-              fontSize={{xs: 48, md: 60, lg: 72}}
+              fontSize={{xs: 36, md: 60, lg: 72}}
             >
               TEMUKAN FASHION YANG COCOK DENGAN GAYA MU
             </Title>

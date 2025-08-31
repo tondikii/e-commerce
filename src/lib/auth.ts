@@ -65,7 +65,14 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({session, token}) {
-      return {...session, user: {...session?.user, name: token?.name}};
+      const newToken = {...token};
+      delete newToken.password;
+      delete newToken.jti;
+      newToken.id = Number(newToken?.id);
+      return {
+        ...session,
+        user: {...session?.user, ...newToken},
+      };
     },
   },
 };

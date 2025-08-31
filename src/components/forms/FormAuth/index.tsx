@@ -129,7 +129,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
         if (signInData?.error) {
           throw new Error(signInData.error);
         }
-        router.push("/cart");
+        router.push("/");
         Swal.fire({
           title: "Berhasil Masuk",
           text: "Selamat datang kembali di Rumah Fashion",
@@ -185,7 +185,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
         <Stack spacing={2}>
           {isSignUp && (
             <StyledInput
-              size="sm"
+              size="md"
               value={formData.name || ""}
               onChange={onChange}
               name="name"
@@ -195,7 +195,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
             />
           )}
           <StyledInput
-            size="sm"
+            size="md"
             label="Alamat Email"
             value={formData.email}
             onChange={onChange}
@@ -205,7 +205,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
             startDecorator={<Mail />}
           />
           <StyledInput
-            size="sm"
+            size="md"
             label="Kata Sandi"
             value={formData.password}
             onChange={onChange}
@@ -224,7 +224,7 @@ const FormAuthComponent: FC<Props> = ({type}) => {
                 setIsStrong={setIsStrongPassword}
               />
               <StyledInput
-                size="sm"
+                size="md"
                 label="Nomor Telepon"
                 value={formData.phoneNumber || ""}
                 onChange={onChange}

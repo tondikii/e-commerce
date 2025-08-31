@@ -49,12 +49,10 @@ const PasswordMeter: FC<Props> = ({password, setIsStrong}) => {
             <span>Indikator ini mengevaluasi kata sandi Anda berdasarkan:</span>
 
             <li>Panjang: Minimal 8 karakter.</li>
-            <li>Huruf Kecil: Minimal satu huruf kecil.</li>
-            <li>Huruf Besar: Minimal satu huruf besar.</li>
-            <li>Angka: Minimal satu angka.</li>
-            <li>
-              Karakter Khusus: Minimal satu karakter khusus (@, #, $, dll.).
-            </li>
+            <li>Huruf Kecil: disertai huruf kecil.</li>
+            <li>Huruf Besar: disertai huruf besar.</li>
+            <li>Angka: disertai angka.</li>
+            <li>Karakter Khusus: disertai karakter khusus (@, #, $, dll.).</li>
           </>
         }
       >
