@@ -12,6 +12,9 @@ const nextConfig = {
   },
   reactStrictMode: false,
   crossOrigin: "anonymous",
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
 };
 
 export default nextConfig;
