@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  {params}: {params: {id: string}}
+  context: {params: Promise<{id: string}>}
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,7 +14,8 @@ export async function GET(
       return NextResponse.json({error: "Unauthorized"}, {status: 401});
     }
 
-    const orderId = parseInt(params.id);
+    const {id} = await context.params;
+    const orderId = parseInt(id);
 
     const order = await prisma.order.findUnique({
       where: {

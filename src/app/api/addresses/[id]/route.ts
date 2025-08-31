@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma";
 
 export async function PUT(
   request: NextRequest,
-  {params}: {params: {id: string}}
+  context: {params: Promise<{id: string}>}
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,11 +15,11 @@ export async function PUT(
       return NextResponse.json({error: "Unauthorized"}, {status: 401});
     }
 
-    const addressId = parseInt(params.id);
+    const {id} = await context.params;
+    const addressId = parseInt(id);
     const body = await request.json();
     const {recipient, phone, address, province, city, postalCode} = body;
 
-    // Cek kepemilikan alamat
     const existingAddress = await prisma.shippingAddress.findUnique({
       where: {id: addressId},
     });
@@ -48,7 +48,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  {params}: {params: {id: string}}
+  context: {params: Promise<{id: string}>}
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -57,9 +57,9 @@ export async function DELETE(
       return NextResponse.json({error: "Unauthorized"}, {status: 401});
     }
 
-    const addressId = parseInt(params.id);
+    const {id} = await context.params;
+    const addressId = parseInt(id);
 
-    // Cek kepemilikan alamat
     const existingAddress = await prisma.shippingAddress.findUnique({
       where: {id: addressId},
     });

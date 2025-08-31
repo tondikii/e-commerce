@@ -4,10 +4,11 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  {params}: {params: {id: string}}
+  context: {params: Promise<{id: string}>}
 ) {
   try {
-    const variantId = parseInt(params.id);
+    const {id} = await context.params;
+    const variantId = parseInt(id);
 
     const variant = await prisma.productVariant.findUnique({
       where: {id: variantId},

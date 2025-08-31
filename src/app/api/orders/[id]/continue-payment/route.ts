@@ -6,7 +6,7 @@ import midtransClient from "midtrans-client";
 
 export async function POST(
   request: NextRequest,
-  {params}: {params: {id: string}}
+  context: {params: Promise<{id: string}>}
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,7 +14,8 @@ export async function POST(
       return NextResponse.json({error: "Unauthorized"}, {status: 401});
     }
 
-    const orderId = parseInt(params.id);
+    const {id} = await context.params;
+    const orderId = parseInt(id);
 
     // Get order with payment details
     const order = await prisma.order.findUnique({
