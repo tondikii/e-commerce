@@ -13,6 +13,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({error: "Unauthorized"}, {status: 401});
     }
 
+    // Get selected items from query parameters
+    const url = new URL(request.url);
+    const selectedItemsParam = url.searchParams.get("items");
+    const selectedItems = selectedItemsParam
+      ? selectedItemsParam.split(",").map(Number)
+      : null;
+
     // Get user's cart with items
     const cart = await prisma.cart.findFirst({
       where: {userId: session.user.id},
@@ -37,13 +44,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({error: "Cart is empty"}, {status: 400});
     }
 
+    // Filter items if selectedItems is provided
+    const filteredItems = selectedItems
+      ? cart.items.filter((item) => selectedItems.includes(item.id))
+      : cart.items;
+
+    if (filteredItems.length === 0) {
+      return NextResponse.json({error: "No items selected"}, {status: 400});
+    }
+
     // Get user's shipping addresses
     const addresses = await prisma.shippingAddress.findMany({
       where: {userId: session.user.id},
     });
 
-    // Calculate totals
-    const subtotal = cart.items.reduce((sum, item) => {
+    // Calculate totals based on filtered items
+    const subtotal = filteredItems.reduce((sum, item) => {
       return sum + item.quantity * item.variant.price;
     }, 0);
 
@@ -53,7 +69,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       cart: {
-        items: cart.items,
+        items: filteredItems,
         subtotal,
         shipping,
         taxes,
@@ -79,7 +95,7 @@ export async function POST(req: NextRequest) {
 
     const userId = Number(session.user.id);
     const body = await req.json();
-    const {shippingAddressId, paymentMethod} = body;
+    const {shippingAddressId, paymentMethod, selectedItems} = body; // Add selectedItems parameter
 
     if (!shippingAddressId || !paymentMethod) {
       return NextResponse.json({error: "Missing fields"}, {status: 400});
@@ -103,7 +119,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({error: "Cart is empty"}, {status: 400});
     }
 
-    for (const item of cart.items) {
+    // Filter items based on selection if provided
+    const itemsToCheckout = selectedItems
+      ? cart.items.filter((item) => selectedItems.includes(item.id))
+      : cart.items;
+
+    if (itemsToCheckout.length === 0) {
+      return NextResponse.json(
+        {error: "No items selected for checkout"},
+        {status: 400}
+      );
+    }
+
+    for (const item of itemsToCheckout) {
       const variant = await prisma.productVariant.findUnique({
         where: {id: item.variantId},
       });
@@ -127,7 +155,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Hitung total
     const shippingCost = 14000; // nanti bisa dynamic
-    const items = cart.items.map((item) => ({
+    const items = itemsToCheckout.map((item) => ({
       id: item.variant.sku,
       price: item.variant.price,
       quantity: item.quantity,
@@ -148,7 +176,7 @@ export async function POST(req: NextRequest) {
         totalAmount,
         status: "PENDING",
         items: {
-          create: cart.items.map((item) => ({
+          create: itemsToCheckout.map((item) => ({
             variantId: item.variantId,
             quantity: item.quantity,
             price: item.variant.price,
@@ -195,8 +223,15 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 6. Hapus cart user
-    await prisma.cartItem.deleteMany({where: {cartId: cart.id}});
+    // 6. Hapus hanya item yang di-checkout dari cart user
+    await prisma.cartItem.deleteMany({
+      where: {
+        cartId: cart.id,
+        id: {
+          in: itemsToCheckout.map((item) => item.id),
+        },
+      },
+    });
 
     return NextResponse.json({
       token: transaction.token,

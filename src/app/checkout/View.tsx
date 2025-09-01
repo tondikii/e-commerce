@@ -85,10 +85,17 @@ const CheckoutPageView = () => {
   const [paymentUrl, setPaymentUrl] = useState("");
   const [showFailedAlert, setShowFailedAlert] = useState(false);
 
+  const selectedItemsParam = searchParams.get("items");
+  const selectedItems = selectedItemsParam
+    ? selectedItemsParam.split(",").map(Number)
+    : null;
+
   const loadCheckoutData = async () => {
     try {
-      const data = await getCheckoutData();
+      // Pass selected items to getCheckoutData
+      const data = await getCheckoutData(selectedItems || undefined);
       setCheckoutData(data);
+
       if (data.addresses.length > 0) {
         setSelectedAddress(data.addresses[0].id.toString());
       }
@@ -102,9 +109,11 @@ const CheckoutPageView = () => {
 
     try {
       setProcessing(true);
+      // Pass selected items to createOrder
       const result = await createOrder(
         parseInt(selectedAddress),
-        selectedPayment
+        selectedPayment,
+        selectedItems || undefined
       );
 
       // Redirect to Midtrans payment page
@@ -480,7 +489,7 @@ const CheckoutPageView = () => {
           <Button
             component={Link}
             href={paymentUrl}
-            target="_blank"
+            // target="_blank"
             rel="noopener noreferrer"
             fullWidth
             size="lg"

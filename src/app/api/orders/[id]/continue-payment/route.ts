@@ -80,10 +80,12 @@ export async function POST(
       name: "Shipping Cost",
     });
 
+    const uniqueOrderId = `${order.orderNumber}-${Date.now()}`;
+
     // Create transaction
     const transaction = await snap.createTransaction({
       transaction_details: {
-        order_id: order.orderNumber,
+        order_id: uniqueOrderId, // ✅ unique per attempt
         gross_amount: order.totalAmount,
       },
       item_details: itemDetails,
@@ -108,19 +110,19 @@ export async function POST(
     });
 
     // Update payment - gunakan field yang sesuai dengan schema Prisma Anda
-    await prisma.payment.update({
+    const payment = await prisma.payment.update({
       where: {id: order.payment.id},
       data: {
         snapToken: transaction.token, // Gunakan snapToken sesuai schema
-        status: "PENDING", // Reset status to pending when retrying
+        status: "PAID", // Reset status to pending when retrying
         expiryAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // Set expiry 24 hours from now
       },
     });
 
     // Also update order status back to PENDING
-    await prisma.order.update({
+    const updatedOrder = await prisma.order.update({
       where: {id: order.id},
-      data: {status: "PENDING"},
+      data: {status: "PROCESSING"},
     });
 
     return NextResponse.json({

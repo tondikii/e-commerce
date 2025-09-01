@@ -16,7 +16,6 @@ import {
   Input,
   Textarea,
   Stack,
-  IconButton,
   Alert,
   Divider,
 } from "@mui/joy";
@@ -24,11 +23,11 @@ import {
   AddRounded,
   EditRounded,
   DeleteRounded,
-  ArrowBackRounded,
   HomeRounded,
 } from "@mui/icons-material";
 import Link from "next/link";
 import {useAddresses} from "@/hooks/useAddresses";
+import {PageLoader} from "@/components";
 
 const AddressesPage = () => {
   const {
@@ -138,11 +137,7 @@ const AddressesPage = () => {
   };
 
   if (loading && addresses.length === 0) {
-    return (
-      <Container maxWidth="md" sx={{py: 4}}>
-        <Typography level="h4">Memuat alamat...</Typography>
-      </Container>
-    );
+    return <PageLoader />;
   }
 
   return (

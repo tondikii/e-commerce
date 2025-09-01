@@ -1,4 +1,4 @@
-// src/hooks/useCheckout.ts
+"use client";
 import {useState} from "react";
 import {api} from "@/lib/axios";
 
@@ -45,10 +45,13 @@ export const useCheckout = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getCheckoutData = async () => {
+  const getCheckoutData = async (selectedItems?: number[]) => {
     try {
       setLoading(true);
-      const response = await api.get("/checkout");
+      const url = selectedItems
+        ? `/checkout?items=${selectedItems.join(",")}`
+        : "/checkout";
+      const response = await api.get(url);
       return response.data;
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to fetch checkout data");
@@ -60,13 +63,15 @@ export const useCheckout = () => {
 
   const createOrder = async (
     shippingAddressId: number,
-    paymentMethod: string
+    paymentMethod: string,
+    selectedItems?: number[] // Add selectedItems parameter
   ) => {
     try {
       setLoading(true);
       const response = await api.post("/checkout", {
         shippingAddressId,
         paymentMethod,
+        selectedItems, // Pass selected items to API
       });
       return response.data;
     } catch (err: any) {

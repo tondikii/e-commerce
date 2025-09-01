@@ -24,19 +24,20 @@ import {
   Typography,
   Input,
   Button,
+  Badge,
 } from "@mui/joy";
 import type {FC} from "react";
 import SubtitleWithDropdown from "./SubtitleWithDropdown";
 import Link from "next/link";
 import useMasterData from "@/store/useMasterData";
 import {signOut, useSession} from "next-auth/react";
-import {useState, useEffect, Suspense} from "react";
+import {useState, useEffect} from "react";
 import {useRouter, useSearchParams} from "next/navigation";
 
 interface Props {}
 
 const Navbar: FC<Props> = ({}) => {
-  const {categories, collections} = useMasterData();
+  const {categories, collections, cart}: any = useMasterData();
   const {data: session} = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -45,6 +46,11 @@ const Navbar: FC<Props> = ({}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Calculate total items in cart
+  const cartItemsCount =
+    cart?.items?.reduce((total: any, item: any) => total + item.quantity, 0) ||
+    0;
 
   // Debounce search input
   useEffect(() => {
@@ -179,8 +185,26 @@ const Navbar: FC<Props> = ({}) => {
         {/* Desktop Icons */}
         <Box sx={{display: {xs: "none", md: "flex"}, gap: 1}}>
           <Link href="/cart">
-            <IconButton variant="plain" color="neutral">
-              <ShoppingCartOutlined />
+            <IconButton
+              variant="plain"
+              color="neutral"
+              sx={{position: "relative"}}
+            >
+              <Badge
+                badgeContent={cartItemsCount ? cartItemsCount : cartItemsCount}
+                color="neutral"
+                max={99}
+                sx={{
+                  "& .MuiBadge-badge": {
+                    fontSize: "0.7rem",
+                    height: "18px",
+                    minWidth: "18px",
+                    padding: "0 4px",
+                  },
+                }}
+              >
+                <ShoppingCartOutlined />
+              </Badge>
             </IconButton>
           </Link>
 
@@ -442,7 +466,7 @@ const Navbar: FC<Props> = ({}) => {
 
           <Divider />
 
-          {/* Mobile Cart */}
+          {/* Mobile Cart with counter */}
           <Box sx={{p: 2}}>
             <Link
               href="/cart"
@@ -452,9 +476,27 @@ const Navbar: FC<Props> = ({}) => {
               <Button
                 variant="outlined"
                 fullWidth
-                startDecorator={<ShoppingCartOutlined />}
+                startDecorator={
+                  <Badge
+                    badgeContent={
+                      cartItemsCount ? cartItemsCount : cartItemsCount
+                    }
+                    color="neutral"
+                    max={99}
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        fontSize: "0.7rem",
+                        height: "18px",
+                        minWidth: "18px",
+                        padding: "0 4px",
+                      },
+                    }}
+                  >
+                    <ShoppingCartOutlined />
+                  </Badge>
+                }
               >
-                Keranjang Belanja
+                Keranjang Belanja {cartItemsCount > 0 && `(${cartItemsCount})`}
               </Button>
             </Link>
           </Box>

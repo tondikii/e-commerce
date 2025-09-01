@@ -2,7 +2,7 @@
 import React, {FC, useEffect, useState} from "react";
 import MasterDataContext from "./MasterDataContext";
 import {Categories, Collections, FetchedData} from "@/types";
-import {useFetch} from "@/hooks";
+import {useCart, useFetch} from "@/hooks";
 import {ENDPOINT_CATEGORIES, ENDPOINT_COLLECTIONS} from "@/constants";
 
 interface Props {
@@ -15,6 +15,14 @@ const MasterDataContextProvider: FC<Props> = ({children}) => {
 
   const fetchedCategories: FetchedData = useFetch(ENDPOINT_CATEGORIES);
   const fetchedCollections: FetchedData = useFetch(ENDPOINT_COLLECTIONS);
+  const {
+    cart,
+    addToCart,
+    loading: loadingCart,
+    error: errorCart,
+    updateQuantity: updateQuantityCart,
+    removeFromCart,
+  }: any = useCart(); // Get cart data
 
   useEffect(() => {
     if (fetchedCategories.data) {
@@ -39,7 +47,18 @@ const MasterDataContextProvider: FC<Props> = ({children}) => {
   }, [fetchedCollections.data]);
 
   return (
-    <MasterDataContext.Provider value={{categories, collections}}>
+    <MasterDataContext.Provider
+      value={{
+        categories,
+        collections,
+        cart: cart,
+        addToCart,
+        loadingCart,
+        errorCart,
+        updateQuantityCart,
+        removeFromCart,
+      }}
+    >
       {children}
     </MasterDataContext.Provider>
   );

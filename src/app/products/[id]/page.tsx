@@ -27,8 +27,9 @@ import {useProduct} from "@/hooks";
 import {api} from "@/lib/axios";
 import {Product} from "@/types";
 import {formatCurrency} from "@/utils";
-import {ShareButton} from "@/components";
+import {PageLoader, ShareButton} from "@/components";
 import {useSession} from "next-auth/react";
+import useMasterData from "@/store/useMasterData";
 
 const ProductDetailPage = () => {
   const {data: session} = useSession();
@@ -40,6 +41,7 @@ const ProductDetailPage = () => {
     error,
   }: {product: any | null | Product; loading: boolean; error: any} =
     useProduct(productId);
+  const {addToCart} = useMasterData();
 
   const router = useRouter();
 
@@ -143,13 +145,7 @@ const ProductDetailPage = () => {
   };
 
   if (loading) {
-    return (
-      <Container maxWidth="lg" sx={{py: 4}}>
-        <Box sx={{textAlign: "center", py: 8}}>
-          <Typography level="h4">Memuat produk...</Typography>
-        </Box>
-      </Container>
-    );
+    return <PageLoader />;
   }
 
   if (error || !product) {
@@ -235,10 +231,7 @@ const ProductDetailPage = () => {
       setActionLoading("addToCart");
       setAddToCartMessage(null);
 
-      const response = await api.post("/cart/add", {
-        variantId: selectedVariant.id,
-        quantity,
-      });
+      addToCart(selectedVariant.id, quantity);
 
       setAddToCartMessage({
         type: "success",

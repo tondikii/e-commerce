@@ -19,6 +19,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {api} from "@/lib/axios";
 import {formatCurrency} from "@/utils";
+import {PageLoader} from "@/components";
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState<any[]>([]);
@@ -73,11 +74,7 @@ const OrdersPage = () => {
   };
 
   if (loading) {
-    return (
-      <Container maxWidth="lg" sx={{py: 4}}>
-        <Typography>Memuat order...</Typography>
-      </Container>
-    );
+    return <PageLoader />;
   }
 
   return (

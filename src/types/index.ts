@@ -86,3 +86,39 @@ export interface FetchedData {
   loading: boolean;
   error: any;
 }
+
+export interface CartItem {
+  id: number;
+  quantity: number;
+  variant: {
+    id: number;
+    price: number;
+    optionValues: any;
+    product: {
+      id: number;
+      name: string;
+      description: string;
+      images: Array<{
+        id: number;
+        url: string;
+        altText: string | null;
+      }>;
+      category: {
+        id: number;
+        name: string;
+      } | null;
+      collection: {
+        id: number;
+        name: string;
+      } | null;
+    };
+  };
+}
+
+export interface Cart {
+  items: CartItem[];
+  total: number;
+  subtotal: number;
+  shipping: number;
+  taxes: number;
+}

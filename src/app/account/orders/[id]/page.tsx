@@ -33,6 +33,7 @@ import Link from "next/link";
 import {useParams} from "next/navigation";
 import {api} from "@/lib/axios";
 import {formatCurrency} from "@/utils";
+import {PageLoader} from "@/components";
 
 const orderSteps = [
   {
@@ -112,11 +113,7 @@ const OrderDetailPage = () => {
   };
 
   if (loading) {
-    return (
-      <Container maxWidth="lg" sx={{py: 4}}>
-        <Typography>Memuat detail order...</Typography>
-      </Container>
-    );
+    return <PageLoader />;
   }
 
   if (error || !order) {
@@ -502,7 +499,7 @@ const OrderDetailPage = () => {
           <Button
             component={Link}
             href={paymentUrl}
-            target="_blank"
+            // target="_blank"
             rel="noopener noreferrer"
             fullWidth
             size="lg"

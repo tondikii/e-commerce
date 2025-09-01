@@ -21,14 +21,13 @@ import {
   PersonRounded,
   LocationOnRounded,
   ReceiptRounded,
-  LockRounded,
   EmailRounded,
   PhoneRounded,
-  EditRounded,
   ArrowForwardRounded,
 } from "@mui/icons-material";
 import Link from "next/link";
 import {useSession} from "next-auth/react";
+import {PageLoader} from "@/components";
 
 const AccountPage = () => {
   const {data: session, status} = useSession();
@@ -49,11 +48,7 @@ const AccountPage = () => {
   }, [session]);
 
   if (status === "loading" || loading) {
-    return (
-      <Container maxWidth="md" sx={{py: 4}}>
-        <Typography>Memuat...</Typography>
-      </Container>
-    );
+    return <PageLoader />;
   }
 
   if (!session) {
